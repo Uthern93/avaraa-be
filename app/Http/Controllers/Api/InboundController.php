@@ -22,7 +22,7 @@ class InboundController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Inbound::with(['warehouse', 'items.item', 'items.rack', 'items.bin', 'createdBy']);
+        $query = Inbound::with(['warehouse', 'items.item', 'items.rack', 'items.bin']);
 
         if ($request->has('status')) {
             $query->byStatus($request->status);
@@ -162,6 +162,7 @@ class InboundController extends Controller
 
         $inbound->update([
             'status' => Inbound::STATUS_VERIFYING,
+            'actual_arrival_date' => now()->toDateString(),
             'updated_by' => auth('api')->id(),
         ]);
 

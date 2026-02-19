@@ -67,6 +67,13 @@ class ItemMasterController extends Controller
             'item_name' => 'required|string|max:255',
             'category_id' => 'required|integer|exists:categories,id',
             'weight' => 'nullable|string|max:50',
+            'storage_type' => 'required|integer|in:1,2,3',
+            'qty_per_pallet' => 'required_if:storage_type,1|nullable|integer|min:1',
+            'qty_per_carton' => 'required_if:storage_type,2|nullable|integer|min:1',
+            'dimension_width' => 'required_if:storage_type,3|nullable|numeric|min:0.01',
+            'dimension_height' => 'required_if:storage_type,3|nullable|numeric|min:0.01',
+            'dimension_depth' => 'required_if:storage_type,3|nullable|numeric|min:0.01',
+            'dimension_unit' => 'required_if:storage_type,3|nullable|in:cm,mm,inch,m',
         ]);
 
         if ($validator->fails()) {
@@ -82,6 +89,13 @@ class ItemMasterController extends Controller
             'item_name' => $request->item_name,
             'category_id' => $request->category_id,
             'weight' => $request->weight,
+            'storage_type' => $request->storage_type,
+            'qty_per_pallet' => $request->qty_per_pallet,
+            'qty_per_carton' => $request->qty_per_carton,
+            'dimension_width' => $request->dimension_width,
+            'dimension_height' => $request->dimension_height,
+            'dimension_depth' => $request->dimension_depth,
+            'dimension_unit' => $request->dimension_unit ?? 'cm',
             'created_by' => auth('api')->id(),
             'updated_by' => auth('api')->id(),
         ]);
@@ -114,6 +128,13 @@ class ItemMasterController extends Controller
             'name' => 'sometimes|required|string|max:255',
             'category_id' => 'sometimes|required|integer|exists:categories,id',
             'weight' => 'nullable|string|max:50',
+            'storage_type' => 'sometimes|required|integer|in:1,2,3',
+            'qty_per_pallet' => 'nullable|integer|min:1',
+            'qty_per_carton' => 'nullable|integer|min:1',
+            'dimension_width' => 'nullable|numeric|min:0.01',
+            'dimension_height' => 'nullable|numeric|min:0.01',
+            'dimension_depth' => 'nullable|numeric|min:0.01',
+            'dimension_unit' => 'nullable|in:cm,mm,inch,m',
         ]);
 
         if ($validator->fails()) {
@@ -137,6 +158,27 @@ class ItemMasterController extends Controller
         }
         if ($request->has('weight')) {
             $data['weight'] = $request->weight;
+        }
+        if ($request->has('storage_type')) {
+            $data['storage_type'] = $request->storage_type;
+        }
+        if ($request->has('qty_per_pallet')) {
+            $data['qty_per_pallet'] = $request->qty_per_pallet;
+        }
+        if ($request->has('qty_per_carton')) {
+            $data['qty_per_carton'] = $request->qty_per_carton;
+        }
+        if ($request->has('dimension_width')) {
+            $data['dimension_width'] = $request->dimension_width;
+        }
+        if ($request->has('dimension_height')) {
+            $data['dimension_height'] = $request->dimension_height;
+        }
+        if ($request->has('dimension_depth')) {
+            $data['dimension_depth'] = $request->dimension_depth;
+        }
+        if ($request->has('dimension_unit')) {
+            $data['dimension_unit'] = $request->dimension_unit;
         }
 
         $item->update($data);

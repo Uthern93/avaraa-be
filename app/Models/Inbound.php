@@ -21,6 +21,7 @@ class Inbound extends Model
         'batch_id',
         'warehouse_id',
         'expected_arrival_date',
+        'actual_arrival_date',
         'status',
         'notes',
         'created_by',
@@ -36,6 +37,7 @@ class Inbound extends Model
     {
         return [
             'expected_arrival_date' => 'date',
+            'actual_arrival_date' => 'date',
         ];
     }
 

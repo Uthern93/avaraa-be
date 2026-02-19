@@ -28,8 +28,28 @@ class ItemMaster extends Model
         'item_name',
         'category_id',
         'weight',
+        'storage_type',
+        'qty_per_pallet',
+        'qty_per_carton',
+        'dimension_width',
+        'dimension_height',
+        'dimension_depth',
+        'dimension_unit',
         'created_by',
         'updated_by',
+    ];
+
+    /**
+     * Storage type constants.
+     */
+    public const STORAGE_PALLET = 1;
+    public const STORAGE_CARTON = 2;
+    public const STORAGE_ODD_SIZE = 3;
+
+    public const STORAGE_TYPES = [
+        self::STORAGE_PALLET => 'Pallet',
+        self::STORAGE_CARTON => 'Carton',
+        self::STORAGE_ODD_SIZE => 'Odd Size',
     ];
 
     /**
