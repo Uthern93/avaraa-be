@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\InboundController;
 use App\Http\Controllers\Api\ItemMasterController;
 use App\Http\Controllers\Api\RackController;
 use App\Http\Controllers\Api\DispatchRequestController;
+use App\Http\Controllers\Api\StockMovementController;
 use App\Http\Controllers\Api\WarehouseController;
 use Illuminate\Support\Facades\Route;
 
@@ -52,6 +53,9 @@ Route::middleware('auth:api')->group(function () {
         Route::put('/{id}/verify', [InboundController::class, 'verify']);
         Route::put('/{id}/items/{itemId}/putaway', [InboundController::class, 'putaway']);
     });
+
+    // Stock Movements (stored procedure report)
+    Route::get('stock-movements', [StockMovementController::class, 'index']);
 
     // Dispatch Requests
     Route::prefix('dispatch-requests')->group(function () {
