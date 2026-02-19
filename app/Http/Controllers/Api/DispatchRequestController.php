@@ -21,7 +21,7 @@ class DispatchRequestController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = DeliveryOrder::with(['user', 'items.item.stocks', 'dispatch.createdBy']);
+        $query = DeliveryOrder::with(['user', 'items.item.stocks', 'items.warehouse', 'items.bin.rack', 'dispatch.createdBy']);
 
         if ($request->filled('status')) {
             $query->byStatus($request->status);
