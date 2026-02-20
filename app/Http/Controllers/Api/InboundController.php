@@ -318,4 +318,68 @@ class InboundController extends Controller
             'data' => $inboundItem,
         ]);
     }
+
+    /**
+     * Bulk verify multiple inbound applications.
+     *
+     * POST /inbound-applications/bulk-verify
+     *
+     * Request body: { "inbound_ids": [1, 5, 12] }
+     */
+    public function bulkVerify(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'inbound_ids' => 'required|array|min:1',
+            'inbound_ids.*' => 'required|integer|exists:inbounds,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $ids = $request->inbound_ids;
+        $inbounds = Inbound::whereIn('id', $ids)->get();
+
+        $verified = [];
+        $skipped = [];
+
+        DB::transaction(function () use ($inbounds, &$verified, &$skipped) {
+            foreach ($inbounds as $inbound) {
+                if ($inbound->status !== Inbound::STATUS_PENDING) {
+                    $skipped[] = [
+                        'id' => $inbound->id,
+                        'inbound_number' => $inbound->inbound_number,
+                        'current_status' => $inbound->status,
+                        'reason' => 'Only pending inbound applications can be verified',
+                    ];
+                    continue;
+                }
+
+                $inbound->update([
+                    'status' => Inbound::STATUS_VERIFYING,
+                    'actual_arrival_date' => now()->toDateString(),
+                    'updated_by' => auth('api')->id(),
+                ]);
+
+                $verified[] = [
+                    'id' => $inbound->id,
+                    'inbound_number' => $inbound->inbound_number,
+                    'status' => $inbound->status,
+                ];
+            }
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => count($verified) . ' inbound(s) verified, ' . count($skipped) . ' skipped',
+            'data' => [
+                'verified' => $verified,
+                'skipped' => $skipped,
+            ],
+        ]);
+    }
 }

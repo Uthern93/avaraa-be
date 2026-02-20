@@ -418,4 +418,66 @@ class DispatchRequestController extends Controller
             'data' => $dispatch,
         ]);
     }
+
+    /**
+     * Bulk start picking for multiple dispatch requests.
+     *
+     * POST /dispatch-requests/bulk-start-picking
+     *
+     * Request body: { "dispatch_ids": [3, 7, 15] }
+     */
+    public function bulkStartPicking(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'dispatch_ids' => 'required|array|min:1',
+            'dispatch_ids.*' => 'required|integer|exists:delivery_orders,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $orders = DeliveryOrder::whereIn('id', $request->dispatch_ids)->get();
+
+        $picked = [];
+        $skipped = [];
+
+        DB::transaction(function () use ($orders, &$picked, &$skipped) {
+            foreach ($orders as $order) {
+                if ($order->status !== DeliveryOrder::STATUS_PENDING) {
+                    $skipped[] = [
+                        'id' => $order->id,
+                        'order_number' => $order->order_number,
+                        'current_status' => $order->status,
+                        'reason' => 'Only pending orders can start picking',
+                    ];
+                    continue;
+                }
+
+                $order->update([
+                    'status' => DeliveryOrder::STATUS_PICKING,
+                    'updated_by' => auth('api')->id(),
+                ]);
+
+                $picked[] = [
+                    'id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'status' => $order->status,
+                ];
+            }
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => count($picked) . ' order(s) started picking, ' . count($skipped) . ' skipped',
+            'data' => [
+                'picked' => $picked,
+                'skipped' => $skipped,
+            ],
+        ]);
+    }
 }

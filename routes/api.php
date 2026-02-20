@@ -49,6 +49,7 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('inbound-applications')->group(function () {
         Route::get('/', [InboundController::class, 'index']);
         Route::post('/', [InboundController::class, 'store']);
+        Route::post('/bulk-verify', [InboundController::class, 'bulkVerify']);
         Route::get('/{id}', [InboundController::class, 'show']);
         Route::put('/{id}/verify', [InboundController::class, 'verify']);
         Route::put('/{id}/items/{itemId}/putaway', [InboundController::class, 'putaway']);
@@ -61,6 +62,7 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('dispatch-requests')->group(function () {
         Route::get('/', [DispatchRequestController::class, 'index']);
         Route::post('/', [DispatchRequestController::class, 'store']);
+        Route::post('/bulk-start-picking', [DispatchRequestController::class, 'bulkStartPicking']);
         Route::get('/{id}', [DispatchRequestController::class, 'show']);
         Route::put('/{id}/start-picking', [DispatchRequestController::class, 'startPicking']);
         Route::put('/{id}/complete-picking', [DispatchRequestController::class, 'completePicking']);

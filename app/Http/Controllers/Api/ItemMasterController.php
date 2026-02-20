@@ -65,15 +65,15 @@ class ItemMasterController extends Controller
         $validator = Validator::make($request->all(), [
             'item_sku' => 'required|string|max:255|unique:item_master,item_sku',
             'item_name' => 'required|string|max:255',
-            'category_id' => 'required|integer|exists:categories,id',
+            'category_id' => 'nullable|integer|exists:categories,id',
             'weight' => 'nullable|string|max:50',
-            'storage_type' => 'required|integer|in:1,2,3',
-            'qty_per_pallet' => 'required_if:storage_type,1|nullable|integer|min:1',
-            'qty_per_carton' => 'required_if:storage_type,2|nullable|integer|min:1',
-            'dimension_width' => 'required_if:storage_type,3|nullable|numeric|min:0.01',
-            'dimension_height' => 'required_if:storage_type,3|nullable|numeric|min:0.01',
-            'dimension_depth' => 'required_if:storage_type,3|nullable|numeric|min:0.01',
-            'dimension_unit' => 'required_if:storage_type,3|nullable|in:cm,mm,inch,m',
+            'storage_type' => 'nullable|integer|in:1,2,3',
+            'qty_per_pallet' => 'nullable|integer|min:1',
+            'qty_per_carton' => 'nullable|integer|min:1',
+            'dimension_width' => 'nullable|numeric|min:0.01',
+            'dimension_height' => 'nullable|numeric|min:0.01',
+            'dimension_depth' => 'nullable|numeric|min:0.01',
+            'dimension_unit' => 'nullable|in:cm,mm,inch,m',
         ]);
 
         if ($validator->fails()) {
@@ -126,9 +126,9 @@ class ItemMasterController extends Controller
         $validator = Validator::make($request->all(), [
             'sku' => 'sometimes|required|string|max:255|unique:item_master,item_sku,' . $item->id,
             'name' => 'sometimes|required|string|max:255',
-            'category_id' => 'sometimes|required|integer|exists:categories,id',
+            'category_id' => 'nullable|integer|exists:categories,id',
             'weight' => 'nullable|string|max:50',
-            'storage_type' => 'sometimes|required|integer|in:1,2,3',
+            'storage_type' => 'nullable|integer|in:1,2,3',
             'qty_per_pallet' => 'nullable|integer|min:1',
             'qty_per_carton' => 'nullable|integer|min:1',
             'dimension_width' => 'nullable|numeric|min:0.01',
